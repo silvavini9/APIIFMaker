@@ -1,46 +1,57 @@
 const Person = require('../models/Person');
 const mongoose = require('mongoose');
-var ObjectId = mongoose.Types.ObjectId();
+
 
 module.exports = {
+    async index(req,res){
+        
+    },
     async register(req,res){
         const { name, cpf }  = req.body;
-
-        var firstUser = await Person.find({}, (user) => {
-            console.log(user);
-        //     if(user > 0){
-        //         return false;
-        //     }
-        //     else {
-        //         return true;
-        //     }
+        var ObjectId = mongoose.Types.ObjectId();
+        var firstUser = await Person.find().then((user) => {
+            if(user == 0){
+                return true;
+            }else {
+                return false;
+            }
+        });
+        var userExist = await Person.findOne(({ CPF: cpf} ), (user) => {
+            if(user) {
+                return true;
+            } else {
+                return false;
+            }
         });
 
-        // if(firstUser){
-        //     var person = new Person({
-        //         _id: ObjectId,
-        //         name: name,
-        //         CPF: cpf,
-        //         password: cpf,
-        //     });
-        // }
-        // else{
-        //     var person = new Person({
-        //         _id: ObjectId,
-        //         name: name,
-        //         CPF: cpf,
-        //         admin: true,
-        //         password: cpf,
-        //     });
-        // } 
-        // await person.save((error) => {
-        //     if(error){
-        //         res.json(error);
-        //     }
-        //     else{
-        //         res.json(person)
-        //     }
-        // });
-        
+        if( firstUser == true){
+            var person = new Person({
+                _id: ObjectId,
+                name: name,
+                CPF: cpf,
+                password: cpf,
+                admin: true    
+            });
+        }else { 
+            if(userExist){
+                res.send('Usuário já existente');
+            } else {
+                var person = new Person({
+                    _id: ObjectId,
+                    name: name,
+                    CPF: cpf,
+                    password: cpf,
+                    admin: false,
+                });
+            }
+        };
+        await person.save((error) => {
+            if(error){
+                res.json(error);
+            }
+            else{
+                res.json(person)
+            }
+        });
     }
 }
