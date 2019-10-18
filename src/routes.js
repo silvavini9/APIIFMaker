@@ -6,6 +6,7 @@ const PersonController =  require("./controllers/PersonController");
 routes.post('/user/register', PersonController.register);
 routes.post('/login', PersonController.login );
 routes.put('/edit', PersonController.edit);
+routes.post('/user/:clickedUser', PersonController.search)
 routes.delete('/delete', PersonController.delete );
 
 

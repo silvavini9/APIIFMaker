@@ -8,12 +8,12 @@ const Admin = {
 
 module.exports = {
     async index(req,res){
-        var persons = await Person.find();
+        const persons = await Person.find();
         res.json(persons);
     },
     async login(req, res){
-        var { cpf, password } = req.body;
-        var userLogin = await Person.findOne({CPF: cpf});
+        const { cpf, password } = req.body;
+        const userLogin = await Person.findOne({CPF: cpf});
         if(userLogin.password == password){
             res.send(`Bem-vindo ${userLogin.name}`);
         } else {
@@ -25,8 +25,8 @@ module.exports = {
     },
     async register(req,res){
         const { name, cpf }  = req.body;
-        var ObjectId = mongoose.Types.ObjectId();
-        var userExist = await Person.findOne(({ CPF: cpf} ));
+        let ObjectId = mongoose.Types.ObjectId();
+        const userExist = await Person.findOne(({ CPF: cpf} ));
         if(userExist){
             res.send('Usuário já existente');
         } else {
@@ -46,10 +46,22 @@ module.exports = {
             }
         });
     },
+    async Search(req, res){
+        const {clickedUser} = req.params;
+        const user = await Person.findOne({ CPF: clickedUser });
+        res.json(user);
+    },
+    async list(req, res){
+        const { userCpf } = req.headers;
+        var users = await Person.find();
+        users.forEach(cpf => {
+            console.log(cpf);
+        });
+    },
     async delete(req, res){
         const { cpf } = req.body;
         const user = await Person.findOne(({ CPF: cpf} ));
-        const { userLogged } = req.headers;
+        const { userCpf } = req.headers;
         if(userLogged == Admin.password){
             await Person.findByIdAndRemove({ _id: user._id });
             res.send('Usuário deletado');
