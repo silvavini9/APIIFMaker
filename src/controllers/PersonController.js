@@ -24,7 +24,7 @@ module.exports = {
         }
     },
     async register(req,res){
-        const { name, cpf }  = req.body;
+        const { name, cpf, siape, graduacao, email }  = req.body;
         let ObjectId = mongoose.Types.ObjectId();
         const userExist = await Person.findOne(({ CPF: cpf} ));
         if(userExist){
@@ -34,6 +34,9 @@ module.exports = {
                 _id: ObjectId,
                 name: name,
                 CPF: cpf,
+                email: email,
+                academicDegree: graduacao,
+                SIAPE: siape,
                 password: cpf,
                 admin: false,
             });
@@ -46,37 +49,48 @@ module.exports = {
             }
         });
     },
-    async Search(req, res){
-        const {clickedUser} = req.params;
+    async search(req, res){
+        const { clickedUser } = req.params;
         const user = await Person.findOne({ CPF: clickedUser });
         res.json(user);
     },
+
     async list(req, res){
-        const { userCpf } = req.headers;
-        var users = await Person.find();
-        users.forEach(cpf => {
-            console.log(cpf);
-        });
+        const users = await Person.find();
+        res.json(users);
     },
+
     async delete(req, res){
         const { cpf } = req.body;
-        const user = await Person.findOne(({ CPF: cpf} ));
-        const { userCpf } = req.headers;
-        if(userLogged == Admin.password){
+        const user = await Person.findOne({ CPF: cpf} );
+        const { usercpf } = req.headers;
+        if(usercpf == Admin.password){
             await Person.findByIdAndRemove({ _id: user._id });
             res.send('Usuário deletado');
         } else {
             res.send('Você não pode excluir este usuário pois não você não é um administrador');
         }
     },
+    
     async edit(req,res){
-        const { password, name, cpf } = req.body;
-        const {userLogged} = req.headers;
-        const person = await Person.findByIdAndUpdate({ CPF: userLogged  }, {
+        const { password, name, cpf, admin } = req.body;
+        const { usercpf } = req.headers;
+        console.log(usercpf);
+        const user = await Person.findOne({ CPF: usercpf} );
+        console.log(user);
+        const person = await Person.findByIdAndUpdate({ _id: user._id  }, {
             name: name,
             password: password,
-            CPF: cpf
+            CPF: cpf,
+            admin: admin,
         })
-        res.json(person)
+        await person.save((error) => {
+            if(error){
+                res.json(error);
+            }else {
+                res.json(person)
+            }
+        })
+        
     }
 }

@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-var ObjectId = Schema.Types.ObjectId;
+const ObjectId = Schema.Types.ObjectId;
 
 
 const PersonSchema = new Schema({
@@ -8,7 +8,15 @@ const PersonSchema = new Schema({
         type: String, 
         required: true,
     },
+    email:{
+        type: String,
+        required: true,
+    },
     CPF: {
+        type: String,
+        required: true,
+    },
+    academicDegree:{
         type: String,
         required: true,
     },
@@ -16,10 +24,14 @@ const PersonSchema = new Schema({
         type: Boolean, 
         default: false
     },
+    SIAPE:{
+        type: String,
+        required: true,
+    },
     password: {
         type: String,
         required: true,
-    }
+    },
 })
 
 module.exports = model('Person', PersonSchema);
