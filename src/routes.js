@@ -1,6 +1,6 @@
 const express = require("express");
 const routes = express.Router();
-const personController =  require("./controllers/personController");
+const personController =  require("./controllers/PersonController");
 const projectController =  require("./controllers/projectController");
 
 // Fazer integração com o bd e os controllers
@@ -13,7 +13,8 @@ routes.delete('/delete', personController.delete);
 
 routes.get('/projects', projectController.index);
 routes.post('/project/add', projectController.register);
-routes.post('/',);
+routes.put('/edit', projectController.edit);
+routes.delete('/delete', projectController.edit);
 
 
 module.exports = routes;

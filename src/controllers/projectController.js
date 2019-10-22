@@ -1,4 +1,4 @@
-const Person = require('../models/Person');
+const Project = require('../models/Project');
 const mongoose = require('mongoose');
 
 const Admin = {
@@ -24,25 +24,29 @@ module.exports = {
         }
     },
     async register(req,res){
-        const { name, cpf }  = req.body;
+        const { name, initialDate, finalDate, financialSupport, requestedfinancialSupport, otherParticipatingInstitutions, resourcesNeededProjectExecution, projectSummary }  = req.body;
         let ObjectId = mongoose.Types.ObjectId();
-        const userExist = await Person.findOne(({ CPF: cpf} ));
-        if(userExist){
-            res.send('Usuário já existente');
+        const projectExist = await Project.findOne(({ CPF: cpf} ));
+        if(projectExist){
+            res.json(projectExist);
         } else {
-            const person = new Person({
+            const project = new Project({
                 _id: ObjectId,
                 name: name,
-                CPF: cpf,
-                password: cpf,
-                admin: false,
+                initialDate: initialDate,
+                finalDate: finalDate,
+                financialSupport: financialSupport,
+                requestedfinancialSupport: requestedfinancialSupport,
+                otherParticipatingInstitutions: otherParticipatingInstitutions,
+                resourcesNeededProjectExecution: resourcesNeededProjectExecution,
+                projectSummary: projectSummary,
             });
         };
-        await person.save((error) => {
+        await project.save((error) => {
             if(error){
                 res.json(error);
             }else{
-                res.json(person)
+                res.json(project)
             }
         });
     },

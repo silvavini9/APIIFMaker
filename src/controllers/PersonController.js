@@ -28,9 +28,9 @@ module.exports = {
         let ObjectId = mongoose.Types.ObjectId();
         const userExist = await Person.findOne(({ CPF: cpf} ));
         if(userExist){
-            res.send('Usuário já existente');
+            res.json(userExist);
         } else {
-            var person = new Person({
+            const person = new Person({
                 _id: ObjectId,
                 name: name,
                 CPF: cpf,
@@ -40,57 +40,48 @@ module.exports = {
                 password: cpf,
                 admin: false,
             });
+            await person.save((error) => {
+                if(error){
+                    res.json(error);
+                }else{
+                    res.json(person)
+                }
+            });
         };
-        await person.save((error) => {
-            if(error){
-                res.json(error);
-            }else{
-                res.json(person)
-            }
-        });
     },
     async search(req, res){
         const { clickedUser } = req.params;
         const user = await Person.findOne({ CPF: clickedUser });
         res.json(user);
     },
-
     async list(req, res){
         const users = await Person.find();
         res.json(users);
     },
-
+    async edit(req,res){
+        const { password, name, cpf, admin } = req.body;
+        const { usercpf } = req.headers;
+        let user = await Person.findOne({ CPF: usercpf} );
+        await Person.findByIdAndUpdate({ _id: user._id  }, {
+            name: name,
+            password: password,
+            CPF: cpf,
+            admin: admin,
+        });
+        res.json(user)
+        
+    },
     async delete(req, res){
         const { cpf } = req.body;
-        const user = await Person.findOne({ CPF: cpf} );
+        let user = await Person.findOne({ CPF: cpf} );
         const { usercpf } = req.headers;
-        if(usercpf == Admin.password){
+        const userLoged = await Person.findOne({ CPF: usercpf });
+        console.log(userLoged);
+        if(userLoged.admin == true){
             await Person.findByIdAndRemove({ _id: user._id });
             res.send('Usuário deletado');
         } else {
             res.send('Você não pode excluir este usuário pois não você não é um administrador');
         }
     },
-    
-    async edit(req,res){
-        const { password, name, cpf, admin } = req.body;
-        const { usercpf } = req.headers;
-        console.log(usercpf);
-        const user = await Person.findOne({ CPF: usercpf} );
-        console.log(user);
-        const person = await Person.findByIdAndUpdate({ _id: user._id  }, {
-            name: name,
-            password: password,
-            CPF: cpf,
-            admin: admin,
-        })
-        await person.save((error) => {
-            if(error){
-                res.json(error);
-            }else {
-                res.json(person)
-            }
-        })
-        
-    }
 }
