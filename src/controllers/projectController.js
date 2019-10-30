@@ -1,4 +1,5 @@
 const Project = require('../models/Project');
+const Person = require('../models/Person');
 const mongoose = require('mongoose');
 
 const Admin = {
@@ -8,15 +9,15 @@ const Admin = {
 
 module.exports = {
     async index(req,res){
-        const persons = await Person.find();
-        res.json(persons);
+        const Projects = await Project.find();
+        res.json(Projects);
     },
     async login(req, res){
         const { cpf, password } = req.body;
         const userLogin = await Person.findOne({CPF: cpf});
         if(userLogin.password == password){
             res.send(`Bem-vindo ${userLogin.name}`);
-        } else {
+        } else{
             if(userLogin.name == "admin@admin" && userLogin.password == Admin.password){
                 res.send("Bem-vindo Admin");   
             }
@@ -26,11 +27,7 @@ module.exports = {
     async register(req,res){
         const { name, initialDate, finalDate, financialSupport, requestedfinancialSupport, otherParticipatingInstitutions, resourcesNeededProjectExecution, projectSummary }  = req.body;
         let ObjectId = mongoose.Types.ObjectId();
-        const projectExist = await Project.findOne(({ CPF: cpf} ));
-        if(projectExist){
-            res.json(projectExist);
-        } else {
-            const project = new Project({
+        const project = new Project({
                 _id: ObjectId,
                 name: name,
                 initialDate: initialDate,
@@ -40,8 +37,7 @@ module.exports = {
                 otherParticipatingInstitutions: otherParticipatingInstitutions,
                 resourcesNeededProjectExecution: resourcesNeededProjectExecution,
                 projectSummary: projectSummary,
-            });
-        };
+        });
         await project.save((error) => {
             if(error){
                 res.json(error);
@@ -51,19 +47,17 @@ module.exports = {
         });
     },
     async search(req, res){
-        const { clickedUser } = req.params;
-        const user = await Person.findOne({ CPF: clickedUser });
-        res.json(user);
-    },
-    async list(req, res){
-        const users = await Person.find();
-        res.json(users);
+        const { clickedProject } = req.params;
+        const project = await Project.findOne({ _id: clickedProject });
+        res.json(project);
     },
     async delete(req, res){
-        const { cpf } = req.body;
-        const user = await Person.findOne(({ CPF: cpf} ));
+        const { projectId } = req.body;       
         const { userCpf } = req.headers;
-        if(userCpf == Admin.password){
+        const project = await Project.findOne(({ _id: projectId} ));
+        const user = await Person.findOne({ cpf: userCpf });
+
+        if(user.admin){
             await Person.findByIdAndRemove({ _id: user._id });
             res.send('Usuário deletado');
         } else {
@@ -71,13 +65,23 @@ module.exports = {
         }
     },
     async edit(req,res){
-        const { password, name, cpf } = req.body;
-        const { userCpf } = req.headers;
-        const person = await Person.findByIdAndUpdate({ CPF: userCpf  }, {
-            name: name,
-            password: password,
-            CPF: cpf
-        })
+        const { name, initialDate, finalDate, financialSupport, requestedfinancialSupport, otherParticipatingInstitutions, resourcesNeededProjectExecution, projectSummary, _id }  = req.body;
+        const { usercpf } = req.headers;
+        if(usercpf.admin == true){
+            const projectExist = await Project.findByIdAndUpdate( {_id: _id},{
+                name,
+                initialDate,
+                finalDate,
+                financialSupport,
+                requestedfinancialSupport,
+                otherParticipatingInstitutions,
+                resourcesNeededProjectExecution,
+                projectSummary,
+            });
+            await projectExist.save( error => {
+                res.json(projectExist);
+            })
+        }
         res.json(person)
     }
 }
