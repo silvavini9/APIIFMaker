@@ -8,13 +8,13 @@ routes.get('/users', personController.index)//
 routes.post('/user/register', personController.register);
 routes.post('/login', personController.login );
 routes.post('/user/:clickedUser', personController.search)
-routes.put('/edit', personController.edit);
-routes.delete('/delete', personController.delete);
+routes.put('/user/edit', personController.edit);
+routes.delete('/:user/delete', personController.delete);
 
 routes.get('/projects', projectController.index);
 routes.post('/project/add', projectController.register);
-routes.put('/edit', projectController.edit);
-routes.delete('/delete', projectController.edit);
+routes.put('/:project/edit', projectController.edit);
+routes.delete('/project/delete', projectController.edit);
 
 
 module.exports = routes;
