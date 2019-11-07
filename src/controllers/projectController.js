@@ -42,7 +42,7 @@ module.exports = {
             if(error){
                 res.json(error);
             }else{
-                res.json(project)
+                res.json(project);
             }
         });
     },
@@ -51,37 +51,27 @@ module.exports = {
         const project = await Project.findOne({ _id: clickedProject });
         res.json(project);
     },
-    async delete(req, res){
-        const { projectId } = req.body;       
-        const { userCpf } = req.headers;
-        const project = await Project.findOne(({ _id: projectId} ));
-        const user = await Person.findOne({ cpf: userCpf });
-
-        if(user.admin){
-            await Person.findByIdAndRemove({ _id: user._id });
-            res.send('Usuário deletado');
-        } else {
-            res.send('Você não pode excluir este usuário pois não você não é um administrador');
-        }
+    delete(req, res){
+        console.log(req.headers);
     },
     async edit(req,res){
-        const { name, initialDate, finalDate, financialSupport, requestedfinancialSupport, otherParticipatingInstitutions, resourcesNeededProjectExecution, projectSummary, _id }  = req.body;
-        const { usercpf } = req.headers;
+        const { name, initialDate, finalDate, financialSupport, requestedfinancialSupport, otherParticipatingInstitutions, resourcesNeededProjectExecution, projectSummary }  = req.body;
+        const { usercpf, projectid } = req.headers;
         if(usercpf.admin == true){
-            const projectExist = await Project.findByIdAndUpdate( {_id: _id},{
-                name,
-                initialDate,
-                finalDate,
-                financialSupport,
-                requestedfinancialSupport,
-                otherParticipatingInstitutions,
-                resourcesNeededProjectExecution,
-                projectSummary,
+            const projectEdited = await Project.findByIdAndUpdate( {_id: projectid},{
+                    name,
+                    initialDate,
+                    finalDate,
+                    financialSupport,
+                    requestedfinancialSupport,
+                    otherParticipatingInstitutions,
+                    resourcesNeededProjectExecution,
+                    projectSummary,
             });
-            await projectExist.save( error => {
-                res.json(projectExist);
-            })
-        }
-        res.json(person)
+            await projectEdited.save( error => {
+                res.redirect('/projects');
+            });
+        } 
     }
-}
+
+} //Fechamento do Module.exports

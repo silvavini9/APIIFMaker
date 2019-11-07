@@ -13,7 +13,7 @@ routes.delete('/:user/delete', personController.delete);
 
 routes.get('/projects', projectController.index);
 routes.post('/project/add', projectController.register);
-routes.put('/:project/edit', projectController.edit);
+routes.put('/project/edit', projectController.edit);
 routes.delete('/project/delete', projectController.edit);
 
 

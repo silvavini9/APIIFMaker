@@ -68,8 +68,7 @@ module.exports = {
             CPF: cpf,
             admin: admin,
         });
-        res.json(user)
-        
+        res.json(user);
     },
     async delete(req, res){
         const { cpf } = req.body;
